@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Search</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto py-8">
+        <h1 class="text-3xl text-center mb-8">Flight Search</h1>
+        <form id="search-form" class="bg-white p-6 rounded shadow-md">
+            <div class="mb-4">
+                <label for="origin" class="block text-gray-700">Origin:</label>
+                <input type="text" id="origin" name="origin" class="w-full px-3 py-2 border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label for="destination" class="block text-gray-700">Destination:</label>
+                <input type="text" id="destination" name="destination" class="w-full px-3 py-2 border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label for="date" class="block text-gray-700">Date:</label>
+                <input type="date" id="date" name="date" class="w-full px-3 py-2 border rounded" required>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
+            </div>
+        </form>
+        <div id="results" class="mt-8"></div>
+    </div>
+
+    <script>
+        document.getElementById('search-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const origin = document.getElementById('origin').value;
+            const destination = document.getElementById('destination').value;
+            const date = document.getElementById('date').value;
+
+            fetch(`/search?origin=${origin}&destination=${destination}&date=${date}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsDiv = document.getElementById('results');
+                    resultsDiv.innerHTML = '';
+
+                    if (data.error) {
+                        resultsDiv.innerHTML = `<p class="text-red-500">${data.error}</p>`;
+                    } else {
+                        data.forEach(flight => {
+                            const flightDiv = document.createElement('div');
+                            flightDiv.classList.add('bg-white', 'p-4', 'rounded', 'shadow', 'mb-4');
+                            flightDiv.innerHTML = `
+                                <p>Agency: ${flight.agency}</p>
+                                <p>Price: ${flight.price}</p>
+                                <p>Flight: ${flight.flight_number}</p>
+                            `;
+                            resultsDiv.appendChild(flightDiv);
+                        });
+                    }
+                });
+        });
+    </script>
+</body>
+</html>
